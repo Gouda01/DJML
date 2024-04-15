@@ -1,5 +1,7 @@
 from django.shortcuts import render
 import pandas as pd
+from rest_framework import generics
+from rest_framework.response import Response
 
 from .models import Iris
 from .forms import IrisForm
@@ -38,3 +40,28 @@ def predict(request):
         form = IrisForm()
 
     return render(request,'predict.html',{'form':form})
+
+
+class PredictApi(generics.GenericAPIView):
+    def post(self, request, **kwargs):
+
+        sepal_length = request.data['sepal_length']
+        sepal_width = request.data['sepal_width']
+        petal_length = request.data['petal_length']
+        petal_width = request.data['petal_width']
+
+        # Prediction :
+        model = pd.read_pickle("model.pickle")
+        resault = model.predict([[sepal_length,sepal_width,petal_length,petal_width]])
+
+        classification = resault[0]
+
+        Iris.objects.create(
+            sepal_length = sepal_length,
+            sepal_width = sepal_width,
+            petal_length = petal_length,
+            petal_width = petal_width,
+            classification = classification,
+        )
+
+        return Response({'class': classification})

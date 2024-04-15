@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Installed Packages :
     'django_bootstrap5',
+    'rest_framework',
 
 
     # My Apps :
